@@ -1,3 +1,5 @@
+
+
 // Initialize and add the map
 var map;
 var markers = [];
@@ -16,17 +18,12 @@ function initMap() {
 
     infoWindow = new google.maps.InfoWindow();
     // The marker, positioned at Uluru
-    resetValue();
-    displayStores(stores);
-    showStoreMarker(stores);
-    setOnClickListener();
-    // const marker = new google.maps.Marker({
-    //     position: uluru,
-    //     map: map,
-    // });
+    // resetValue();
+    //showStoreMarker(stores);
+    getStores();
 }
 
-function showStoreMarker(stores) {
+const showStoreMarker = (stores) => {
     var bounds = new google.maps.LatLngBounds();
     stores.forEach(function (store, index) {
         var latLng = new google.maps.LatLng(
@@ -41,8 +38,49 @@ function showStoreMarker(stores) {
     map.fitBounds(bounds)
 }
 
-function createMarker(latLng, name, address, index) {
-    var html = `<b>${name}</b> <br/>${address}`
+const getStores = () => {
+    const API_URL = `http://localhost:3000/api/stores`;
+    fetch(API_URL)
+        .then((response) => {
+            if (response.status == 200) {
+                return response.json();
+            } else {
+                throw new Error(response.status)
+            }
+        }).then((data) => {
+            searchLocationsNear(data);
+            displayStores(data);
+            setOnClickListener();
+        })
+}
+
+const createMarker = (latLng, name, address, openStatusText, phone, index) => {
+
+    var html = `
+        <div class="store-info">
+            <div class="store-info-name">
+                ${name}
+            </div>
+            <div class="store-info-open-status">
+                ${openStatusText}
+            </div>
+            <div class="store-info-address flex-row">
+                <div class="icon flex">
+                    <i class="fas fa-location-arrow"></i> 
+                </div>
+                <span>${address}</span>
+            </div>
+            <div class="store-info-phone flex-row">
+                <div class="icon flex">
+                    <i class="fas fa-phone-alt"></i> 
+                </div>
+                <span><a href="tel:${phone}" >${phone}</a></span>
+            </div>
+
+
+        </div>
+
+    `
     var marker = new google.maps.Marker({
         position: latLng,
         map: map,
@@ -55,7 +93,7 @@ function createMarker(latLng, name, address, index) {
     markers.push(marker)
 }
 
-searchStore = () => {
+const searchStore = () => {
     var foundStore = [];
     var zipCode = document.getElementById('search-location').value;
     console.log(zipCode)
@@ -73,11 +111,9 @@ searchStore = () => {
     displayStores(foundStore);
     showStoreMarker(foundStore);
     setOnClickListener();
-
-
 }
 
-function setOnClickListener() {
+const setOnClickListener = () => {
     var storeElement = document.querySelectorAll('.store-container');
     storeElement.forEach(function (elem, index) {
         elem.addEventListener('click', function () {
@@ -87,7 +123,7 @@ function setOnClickListener() {
 }
 
 
-function displayStores(stores) {
+const displayStores = (stores) => {
     var storesHtml = '';
     stores.forEach(function (store, index) {
         storesHtml += `
@@ -95,8 +131,8 @@ function displayStores(stores) {
             <div class="store-container-background">
                 <div class="store-info-container">
                     <div class="store-address">
-                        <span>${store.addressLines[0]}</span>
-                        <span>${store.addressLines[1]}</span>
+                        <span>${store.addressLine[0]}</span>
+                        <span>${store.addressLine[1]}</span>
                     </div>
                     <div class="store-phone-number">${store.phoneNumber}</div>
                 </div>
@@ -110,7 +146,7 @@ function displayStores(stores) {
     document.querySelector('.stores-list').innerHTML = storesHtml;
 }
 
-function clearLocations() {
+const clearLocations = () => {
     infoWindow.close();
     for (var i = 0; i < markers.length; i++) {
         markers[i].setMap(null)
@@ -118,6 +154,25 @@ function clearLocations() {
     markers.length = 0;
 }
 
-resetValue = () => {
+const resetValue = () => {
     document.getElementById('search-location').value = '';
+}
+
+const searchLocationsNear = (stores) => {
+    let bounds = new google.maps.LatLngBounds();
+
+    stores.forEach((store, index) => {
+        let latLng = new google.maps.LatLng(
+            store.location.coordinates[1],
+            store.location.coordinates[0]
+        );
+        let name = store.storeName;
+        let address = store.addressLine[0];
+        let openStatusText = store.openStatusText;
+        let phone = store.phoneNumber
+        createMarker(latLng, name, address, openStatusText, phone, index);
+        bounds.extend(latLng)
+    })
+    map.fitBounds(bounds)
+
 }

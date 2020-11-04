@@ -131,6 +131,63 @@ body {
 .store-container-background:hover{
     background-color: #F0F0F0;
 }
+
 .store-container{
     border-bottom: 1px solid;
+}
+
+.store-info{
+    min-width: 300px;
+    padding: 8px;
+}
+
+.store-info-name{
+    font-size: 24px;
+    font-weight: bold;
+    color: rgba(0,0,0,.8);
+}
+
+.store-info-open-status{
+    font-size: 18px;
+    margin-top: 8px;
+    border-bottom: 0.5px solid #ccc;
+    padding-bottom: 8px;
+    color: rgba(0,0,0,0.5);
+}
+
+.store-info-address, .store-info-phone{
+    margin-top: 8px;
+}
+
+.flex-row{
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    align-items: center;
+}
+
+.flex{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.flex i{
+    color:white;
+}
+.flex-row span{
+    margin-left: 8px;
+    font-size: 18px;
+}
+
+.icon{
+    width: 30px;
+    height: 30px;
+    background-color: #1985A1;
+    border-radius: 50%;
+}
+
+
+.store-info-phone a, .store-info-address{
+    color: #514C4C;
+    text-decoration: none;
 }
