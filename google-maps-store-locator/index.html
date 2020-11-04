@@ -5,7 +5,7 @@
     <title>Google Maps Store Locator</title>
     <script src="https://kit.fontawesome.com/c939d0e917.js"></script>
     <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiPSwSdy-pQkvEJnyadMxGqAmogLUzuQU&callback=initMap&libraries=&v=weekly"
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiPSwSdy-pQkvEJnyadMxGqAmogLUzuQU&callback=initMap&libraries=places&v=weekly"
         defer></script>
     <link rel="stylesheet" type="text/css" href="./style/style.css">
     <script src="js/index.js"></script>
@@ -16,12 +16,16 @@
     <div class='title'>Store locator</div>
     <div class='search-container'>
         <div class=search>
-            <input type="text" name="search-location" id="search-location" placeholder="inserisci codice zip">
-            <i class="fas fa-search" onclick="searchStore()"></i>
+            <input type="text" name="search-location" id="search-location" onkeyup="onEnter(event)"
+                placeholder="Enter your address">
+            <i class="fas fa-search" onclick="getStores()"></i>
         </div>
     </div>
     <div class="store-list-container">
         <div class="stores-list">
+            <div class="intro">
+                <span class="enter-zip">Enter zip code</span><span class="find-store">Find store near you</span>
+            </div>
         </div>
     </div>
     <div id='map' class='hw400'></div>

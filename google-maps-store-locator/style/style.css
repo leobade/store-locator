@@ -59,6 +59,7 @@ body {
 .search i {
     font-size: 25px;
     color: white;
+    cursor: pointer;
 }
 
 .store-list-container {
@@ -190,4 +191,32 @@ body {
 .store-info-phone a, .store-info-address{
     color: #514C4C;
     text-decoration: none;
+}
+
+
+.intro{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+}
+
+.enter-zip{
+    font-size: 22px;
+    color: #514C4C;
+}
+
+.find-store{
+    font-size: 20px;
+    color:#1985A1; 
+}
+
+.no-store-found{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    font-size: 20px;
 }

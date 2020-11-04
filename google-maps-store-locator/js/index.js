@@ -5,9 +5,9 @@ var map;
 var markers = [];
 var infoWindow;
 var locationSelect;
+var near_place;
 
 function initMap() {
-    // The location of Uluru
     const la = { lat: 34.052, lng: -118.243 };
     // The map, centered at Uluru
     map = new google.maps.Map(document.getElementById("map"), {
@@ -15,32 +15,51 @@ function initMap() {
         mapTypeId: 'roadmap',
         center: la,
     });
-
     infoWindow = new google.maps.InfoWindow();
-    // The marker, positioned at Uluru
-    // resetValue();
-    //showStoreMarker(stores);
+
+    var option = {
+        types: ['geocode']
+    }
+
+    var input = document.getElementById('search-location')
+    //  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+    var autocomplete = new google.maps.places.Autocomplete(input, option)
+
+    console.log(autocomplete);
+    google.maps.event.addListener(autocomplete, 'place_changed', () => {
+        near_place = autocomplete.getPlace();
+
+    })
     getStores();
+
+    resetValue();
 }
 
-const showStoreMarker = (stores) => {
-    var bounds = new google.maps.LatLngBounds();
-    stores.forEach(function (store, index) {
-        var latLng = new google.maps.LatLng(
-            store.coordinates.latitude,
-            store.coordinates.longitude
-        );
-        var name = store.name;
-        var address = store.addressLines[0];
-        createMarker(latLng, name, address, index)
-        bounds.extend(latLng)
-    })
-    map.fitBounds(bounds)
+const onEnter = (e) => {
+    if (e.key == 'Enter') {
+        getStores();
+    }
 }
+
+
 
 const getStores = () => {
+    console.log('near_place', near_place)
+    var lat, lng;
+    let fullurl = '';
     const API_URL = `http://localhost:3000/api/stores`;
-    fetch(API_URL)
+
+    if (near_place) {
+        lat = near_place.geometry.location.lat()
+        lng = near_place.geometry.location.lng()
+
+        fullurl = `${API_URL}?lat=${lat}&lng=${lng}`
+    } else {
+        fullurl = `${API_URL}`
+    }
+    console.log(fullurl)
+    fetch(fullurl)
         .then((response) => {
             if (response.status == 200) {
                 return response.json();
@@ -48,9 +67,14 @@ const getStores = () => {
                 throw new Error(response.status)
             }
         }).then((data) => {
-            searchLocationsNear(data);
-            displayStores(data);
-            setOnClickListener();
+            clearLocations();
+            if (data.length) {
+                searchLocationsNear(data);
+                displayStores(data);
+                setOnClickListener();
+            } else {
+                noFoundStore();
+            }
         })
 }
 
@@ -93,24 +117,19 @@ const createMarker = (latLng, name, address, openStatusText, phone, index) => {
     markers.push(marker)
 }
 
-const searchStore = () => {
-    var foundStore = [];
-    var zipCode = document.getElementById('search-location').value;
-    console.log(zipCode)
-    if (zipCode) {
-        stores.forEach(function (store, index) {
-            var postalCode = store.address.postalCode.substring(0, 5);
-            if (postalCode == zipCode) {
-                foundStore.push(store)
-            }
-        })
-    } else {
-        foundStore = stores;
-    }
-    clearLocations();
-    displayStores(foundStore);
-    showStoreMarker(foundStore);
-    setOnClickListener();
+const showStoreMarker = (stores) => {
+    var bounds = new google.maps.LatLngBounds();
+    stores.forEach(function (store, index) {
+        var latLng = new google.maps.LatLng(
+            store.coordinates.latitude,
+            store.coordinates.longitude
+        );
+        var name = store.name;
+        var address = store.addressLines[0];
+        createMarker(latLng, name, address, index)
+        bounds.extend(latLng)
+    })
+    map.fitBounds(bounds)
 }
 
 const setOnClickListener = () => {
@@ -122,6 +141,15 @@ const setOnClickListener = () => {
     })
 }
 
+const noFoundStore = () => {
+    const html = `
+        <div class="no-store-found">
+          No store found      
+        </div>
+    `;
+
+    document.querySelector('.stores-list').innerHTML = html;
+}
 
 const displayStores = (stores) => {
     var storesHtml = '';
@@ -154,9 +182,6 @@ const clearLocations = () => {
     markers.length = 0;
 }
 
-const resetValue = () => {
-    document.getElementById('search-location').value = '';
-}
 
 const searchLocationsNear = (stores) => {
     let bounds = new google.maps.LatLngBounds();
@@ -176,3 +201,27 @@ const searchLocationsNear = (stores) => {
     map.fitBounds(bounds)
 
 }
+
+const resetValue = () => {
+    document.getElementById('search-location').value = '';
+}
+
+// const searchStore = () => {
+//     var foundStore = [];
+//     var zipCode = document.getElementById('search-location').value;
+//     console.log(zipCode)
+//     if (zipCode) {
+//         stores.forEach(function (store, index) {
+//             var postalCode = store.address.postalCode.substring(0, 5);
+//             if (postalCode == zipCode) {
+//                 foundStore.push(store)
+//             }
+//         })
+//     } else {
+//         foundStore = stores;
+//     }
+//     clearLocations();
+//     displayStores(foundStore);
+//     showStoreMarker(foundStore);
+//     setOnClickListener();
+// }

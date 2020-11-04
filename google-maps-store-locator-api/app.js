@@ -6,10 +6,15 @@ const app = express();
 const PORT = 3000;
 const Store = require('./api/models/store')
 
+const GoogleMapsServices = require('./api/services/googleMapsService')
+const googleMapsService = new GoogleMapsServices();
+
+require('dotenv').config()
+
 mongoose.connect('mongodb+srv://leonardo:gQm3Kz7Ht6OYqbAR@cluster0.o0xkr.mongodb.net/<dbname>?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useCreateIndexe: true,
+    useCreateIndex: true,
 });
 
 app.use(express.json({ limit: '50mb' }));
@@ -51,44 +56,35 @@ app.post('/api/stores', (req, res) => {
 })
 
 app.get('/api/stores', (req, res) => {
-    const zipCode = req.query.zipcode
+    let filter = {}
 
-    const googleMapsURL = `https://maps.googleapis.com/maps/api/geocode/json`
-    axios.get(googleMapsURL, {
-        params: {
-            address: zipCode,
-            key: 'AIzaSyAiPSwSdy-pQkvEJnyadMxGqAmogLUzuQU'
-        }
-    }).then((response) => {
+    if (req.query.lat && req.query.lng) {
+        const lat = req.query.lat
+        const lng = req.query.lng
 
-        const data = response.data;
-        const coordinates = [
-            data.results[0].geometry.location.lng,
-            data.results[0].geometry.location.lat
-        ]
-
-        const filter = {
+        filter = {
             location: {
                 $near: {
                     $maxDistance: 3218,
                     $geometry: {
                         type: "Point",
-                        coordinates: coordinates,
+                        coordinates: [lng, lat],
                     }
                 }
             }
         }
-        const stores = Store.find(filter, (err, stores) => {
-            if (err) {
-                res.status(400).send(err);
-            } else {
-                res.status(200).send(stores);
-            }
-        });
+    } else {
+        filter = {}
+    }
+    console.log(filter);
+    const stores = Store.find(filter, (err, stores) => {
+        if (err) {
+            res.status(400).send(err);
+        } else {
+            res.status(200).send(stores);
+        }
+    });
 
-    }).catch((err) => {
-        console.log(err)
-    })
 
 
 })
