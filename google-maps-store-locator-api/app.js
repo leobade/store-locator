@@ -54,7 +54,9 @@ app.post('/api/stores', (req, res) => {
         }
     })
 })
-
+app.get('/', (req, res) => {
+    res.send('Hello Node.js')
+})
 app.get('/api/stores', (req, res) => {
     let filter = {}
 

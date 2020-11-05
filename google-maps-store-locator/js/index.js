@@ -29,10 +29,9 @@ function initMap() {
     console.log(autocomplete);
     google.maps.event.addListener(autocomplete, 'place_changed', () => {
         near_place = autocomplete.getPlace();
-
+        getStores();
     })
     getStores();
-
     resetValue();
 }
 

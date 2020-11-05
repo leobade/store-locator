@@ -1,0 +1,11 @@
+$red: red;
+
+@media screen and (max-width: 1024px){
+    .title{
+        font-size: 50px;
+        display: flex;
+    }
+    .store-list-container{
+        height: 400px;
+    }
+}
