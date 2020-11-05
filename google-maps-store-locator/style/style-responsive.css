@@ -16,6 +16,12 @@
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
+    width: 80%;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -ms-flex-line-pack: center;
+        align-content: center;
   }
   .store-list-container {
     width: 80%;
