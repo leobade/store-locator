@@ -6,6 +6,7 @@ var markers = [];
 var infoWindow;
 var locationSelect;
 var near_place;
+const MAIN_URL = `https://proven-serenity-293213.ew.r.appspot.com/`;
 
 function initMap() {
     const la = { lat: 34.052, lng: -118.243 };
@@ -47,7 +48,7 @@ const getStores = () => {
     console.log('near_place', near_place)
     var lat, lng;
     let fullurl = '';
-    const API_URL = `http://localhost:3000/api/stores`;
+    const API_URL = `${MAIN_URL}/api/stores`;
 
     if (near_place) {
         lat = near_place.geometry.location.lat()
